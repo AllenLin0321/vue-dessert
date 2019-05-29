@@ -56,9 +56,11 @@ export default {
             const api = `${process.env.VUE_APP_APIPATH}/admin/signin`;
             const vm = this;
             this.$http.post(api, vm.user).then((res) => {
-                // console.log(res);
                 if(res.data.success) {
-                    vm.$router.push('/');
+                    alert("成功登入!");
+                    vm.$router.push('/admin/products');
+                }else {
+                  alert("帳號/密碼錯誤!");
                 }
             })
         }

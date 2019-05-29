@@ -1,5 +1,6 @@
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import 'bootstrap';
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -24,7 +25,8 @@ router.beforeEach((to, from, next) => {
       if(res.data.success) {
         next();
       }else {
-        next({
+        alert("請先登入");
+        next({          
           path: '/login'
         });
       }
