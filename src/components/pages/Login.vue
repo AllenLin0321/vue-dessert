@@ -53,10 +53,10 @@ export default {
     },
     methods: {
         signin() {
-            const api = `${process.env.VUE_APP_APIPATH}/signin`;
+            const api = `${process.env.VUE_APP_APIPATH}/admin/signin`;
             const vm = this;
             this.$http.post(api, vm.user).then((res) => {
-                console.log(res.data);
+                // console.log(res);
                 if(res.data.success) {
                     vm.$router.push('/');
                 }

@@ -10,7 +10,7 @@ export default {
     const api = `${process.env.VUE_APP_APIPATH}/api/${
       process.env.VUE_APP_CUSTOMPATH
     }/products`;
-    console.log(api);
+    // console.log(api);
     this.axios.get(api).then(response => {
       console.log(response.data);
     });
