@@ -1,13 +1,13 @@
 <template>
   <div>
+    <!-- Navigation Bar -->
     <Navbar/>
-
     <div class="container-fluid">
       <div class="row">
+        <!-- Side Bar -->
         <Sidebar/>
-
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-          <router-view></router-view>
+          <router-view/>
         </main>
       </div>
     </div>

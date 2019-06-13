@@ -43,28 +43,28 @@
 
 <script>
 export default {
-    data() {
-        return {
-            user: {
-                username: '',
-                password: ''
-            }
+  data() {
+    return {
+      user: {
+        username: "",
+        password: ""
+      }
+    };
+  },
+  methods: {
+    signin() {
+      const api = `${process.env.VUE_APP_APIPATH}/admin/signin`;
+      const vm = this;
+      this.$http.post(api, vm.user).then(res => {
+        if (res.data.success) {
+          alert("成功登入!");
+          vm.$router.push("/admin/products");
+        } else {
+          alert("帳號/密碼錯誤!");
         }
-    },
-    methods: {
-        signin() {
-            const api = `${process.env.VUE_APP_APIPATH}/admin/signin`;
-            const vm = this;
-            this.$http.post(api, vm.user).then((res) => {
-                if(res.data.success) {
-                    alert("成功登入!");
-                    vm.$router.push('/admin/products');
-                }else {
-                  alert("帳號/密碼錯誤!");
-                }
-            })
-        }
+      });
     }
+  }
 };
 </script>
 

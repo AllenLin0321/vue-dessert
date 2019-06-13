@@ -1,19 +1,23 @@
 <template>
   <div>
+    <loading :active.sync="isLoading"></loading>
+
     <div class="text-right mt-4">
       <button class="btn btn-primary" @click="openModal(true)">建立新的產品</button>
     </div>
     <table class="table mt-4">
+      <!-- Table Header -->
       <thead>
         <tr>
           <td width="120">分類</td>
           <td>產品名稱</td>
           <td width="120">原價</td>
           <td width="120">售價</td>
-          <td width="80">是否啟用</td>
-          <td width="120">編輯</td>
+          <td width="120">是否啟用</td>
+          <td width="180">編輯</td>
         </tr>
       </thead>
+      <!-- Table Data -->
       <tbody>
         <tr v-for="item in products" :key="item.id">
           <td>{{ item.category }}</td>
@@ -25,14 +29,14 @@
             <span v-else>未啟用</span>
           </td>
           <td>
-            <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
+            <button class="btn btn-outline-primary btn-sm mr-3" @click="openModal(false, item)">編輯</button>
+            <button class="btn btn-outline-danger btn-sm" @click="deleteProduct(item)">刪除</button>
           </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Modal -->
-
     <div
       class="modal fade"
       id="productModal"
@@ -67,9 +71,15 @@
                 <div class="form-group">
                   <label for="customFile">
                     或 上傳圖片
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <i class="fas fa-spinner fa-spin" v-if="status.fileUploading"></i>
                   </label>
-                  <input type="file" id="customFile" class="form-control" ref="files">
+                  <input
+                    type="file"
+                    id="customFile"
+                    class="form-control"
+                    ref="files"
+                    @change="uploadFile"
+                  >
                 </div>
                 <img
                   img="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=828346ed697837ce808cae68d3ddc3cf&auto=format&fit=crop&w=1350&q=80"
@@ -219,7 +229,11 @@ export default {
     return {
       products: [],
       tempProduct: {},
-      isNew: false
+      isNew: false,
+      isLoading: false,
+      status: {
+        fileUploading: false,
+      }
     };
   },
   methods: {
@@ -228,7 +242,9 @@ export default {
         process.env.VUE_APP_CUSTOMPATH
       }/admin/products`;
       const vm = this;
+      vm.isLoading = true;
       this.axios.get(api).then(response => {
+        vm.isLoading = false;
         vm.products = response.data.products;
       });
     },
@@ -237,6 +253,8 @@ export default {
         this.tempProduct = {};
         this.isNew = true;
       } else {
+        // Assign the item object into a empty object
+        // Avoid data address reference
         this.tempProduct = Object.assign({}, item);
         this.isNew = false;
       }
@@ -250,19 +268,66 @@ export default {
       const vm = this;
 
       if (!this.isNew) {
-          api+=`/${vm.tempProduct.id}`;
-          httpMethod = "put"
+        api += `/${vm.tempProduct.id}`;
+        httpMethod = "put";
       }
 
       this.axios[httpMethod](api, { data: vm.tempProduct }).then(response => {
-        console.log(response.data.success);
-        if (response.data.success) {
-          $("#productModal").modal("hide");
-          vm.getProducts();
-        } else {
+        console.log(response.data);
+
+        // Close the modal
+        $("#productModal").modal("hide");
+
+        // Update the product table
+        vm.getProducts();
+
+        if (!response.data.success) {
           alert("ERROR!");
         }
       });
+    },
+    deleteProduct(item) {
+      const api = `${process.env.VUE_APP_APIPATH}/api/${
+        process.env.VUE_APP_CUSTOMPATH
+      }/admin/product/${item.id}`;
+      const vm = this;
+      vm.axios.delete(api).then(res => {
+        // Update Product Tables
+        vm.getProducts();
+
+        console.log(res);
+
+        if (res.data.success) {
+          alert("刪除成功");
+        } else {
+          alert("刪除失敗");
+        }
+      });
+    },
+    uploadFile() {
+      const url = `${process.env.VUE_APP_APIPATH}/api/${
+        process.env.VUE_APP_CUSTOMPATH
+      }/admin/upload`;
+      const uploadedFile = this.$refs.files.files[0];
+      const vm = this;
+      const formData = new FormData();
+      formData.append("file-to-upload", uploadedFile);
+      vm.status.fileUploading = true;
+      this.axios
+        .post(url, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
+        .then(res => {
+          console.log(res.data);
+          vm.status.fileUploading = false;
+          if (res.data.success) {
+            // vm.tempProduct.imageUrl = res.data.imageUrl
+            // console.log(vm.tempProduct);
+            vm.$set(vm.tempProduct, "imageUrl", res.data.imageUrl);
+          }
+        });
     }
   },
   created() {

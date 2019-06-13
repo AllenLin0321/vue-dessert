@@ -8,7 +8,7 @@
       aria-label="Search"
     >
     <ul class="navbar-nav px-3">
-      <li class="nav-item text-nowrap">
+      <li class="nav-item text-nowrap logOut">
         <a class="nav-link" @click.prevent="singout">Sign out</a>
       </li>
     </ul>
@@ -32,3 +32,8 @@ export default {
 }
 </script>
 
+<style lang="scss" scoped>
+.logOut {
+  cursor: pointer;
+}
+</style>
