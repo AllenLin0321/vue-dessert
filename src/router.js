@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Dashboard from './components/Dashboard'
 import Products from './components/pages/Products'
+import Orders from './components/pages/Orders'
+import CustomerOrders from './components/pages/CustomerOrders'
 
 Vue.use(Router)
 
@@ -38,6 +40,19 @@ export default new Router({
         meta: {
           requiresAuth: true
         }
+      }]
+    },
+    {
+      path: '/',
+      name: 'dashboard',
+      component: Dashboard,
+      meta: {
+        requiresAuth: true
+      },
+      children: [{
+        path: 'customer_order',
+        name: 'CustomerOrder',
+        component: CustomerOrders
       }]
     },
   ]
