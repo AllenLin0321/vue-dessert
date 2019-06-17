@@ -4,6 +4,7 @@ import 'bootstrap';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import './bus'
+import currencyFilter from '@/filters/currency'
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -12,6 +13,7 @@ import store from './store'
 
 Vue.use(VueAxios, axios);
 Vue.component('Loading', Loading);
+Vue.filter('currency', currencyFilter);
 
 Vue.config.productionTip = false;
 axios.defaults.withCredentials = true;
