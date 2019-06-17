@@ -280,7 +280,6 @@ export default {
       const vm = this;
       vm.isLoading = true;
       this.axios.get(api).then(response => {
-        console.log(response);
         vm.isLoading = false;
         vm.products = response.data.products;
         vm.pagination = response.data.pagination;
@@ -311,8 +310,6 @@ export default {
       }
 
       this.axios[httpMethod](api, { data: vm.tempProduct }).then(response => {
-        console.log(response.data);
-
         // Close the modal
         $("#productModal").modal("hide");
 
@@ -332,8 +329,6 @@ export default {
       vm.axios.delete(api).then(res => {
         // Update Product Tables
         vm.getProducts();
-
-        console.log(res);
 
         if (res.data.success) {
           alert("刪除成功");
@@ -358,7 +353,6 @@ export default {
           }
         })
         .then(res => {
-          console.log(res.data);
           vm.status.fileUploading = false;
           if (res.data.success) {
             // vm.tempProduct.imageUrl = res.data.imageUrl
