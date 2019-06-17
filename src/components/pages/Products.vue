@@ -36,6 +36,41 @@
       </tbody>
     </table>
 
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <!-- Previ Page -->
+        <li class="page-item" :class="{'disabled': !pagination.has_pre}">
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Previous"
+            @click.prevent="getProducts(current_page-1)"
+          >
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li
+          class="page-item"
+          v-for="page in pagination.total_pages"
+          :key="page"
+          :class="{'active': pagination.current_page === page}"
+        >
+          <a class="page-link" href="#" @click.prevent="getProducts(page)">{{ page }}</a>
+        </li>
+        <!-- Next Page -->
+        <li class="page-item" :class="{'disabled': !pagination.has_next}">
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Next"
+            @click.prevent="getProducts(current_page+1)"
+          >
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
     <!-- Modal -->
     <div
       class="modal fade"
@@ -229,23 +264,26 @@ export default {
     return {
       products: [],
       tempProduct: {},
+      pagination: {},
       isNew: false,
       isLoading: false,
       status: {
-        fileUploading: false,
+        fileUploading: false
       }
     };
   },
   methods: {
-    getProducts() {
+    getProducts(page = 1) {
       const api = `${process.env.VUE_APP_APIPATH}/api/${
         process.env.VUE_APP_CUSTOMPATH
-      }/admin/products`;
+      }/admin/products/?page=${page}`;
       const vm = this;
       vm.isLoading = true;
       this.axios.get(api).then(response => {
+        console.log(response);
         vm.isLoading = false;
         vm.products = response.data.products;
+        vm.pagination = response.data.pagination;
       });
     },
     openModal(isNew, item) {
@@ -326,6 +364,8 @@ export default {
             // vm.tempProduct.imageUrl = res.data.imageUrl
             // console.log(vm.tempProduct);
             vm.$set(vm.tempProduct, "imageUrl", res.data.imageUrl);
+          } else {
+            vm.$bus.$emit("messsage:push", res.data.message, "danger");
           }
         });
     }
