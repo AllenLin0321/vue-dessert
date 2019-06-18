@@ -29,7 +29,11 @@
               <i class="fas fa-spinner fa-spin" v-if="product.id === status.loadingItem"></i>
               查看更多
             </button>
-            <button type="button" class="btn btn-outline-danger btn-sm ml-auto">
+            <button
+              type="button"
+              class="btn btn-outline-danger btn-sm ml-auto"
+              @click="addtoCart(item.id)"
+            >
               <i class="fas fa-spinner fa-spin" v-if="product.id === status.loadingItem"></i>
               加到購物車
             </button>
@@ -126,10 +130,41 @@ export default {
         $("#productModal").modal("show");
         vm.status.loadingItem = "";
       });
+    },
+    addtoCart(id, qty = 1) {
+      const vm = this;
+      const url = `${process.env.VUE_APP_APIPATH}/api/${
+        process.env.VUE_APP_CUSTOMPATH
+      }/cart`;
+      vm.status.loadingItem = id;
+
+      const cart = {
+        product_id: id,
+        qty
+      };
+
+      this.$http.post(url, { data: cart }).then(response => {
+        console.log(response);
+        $("#productModal").modal("hide");
+        vm.status.loadingItem = "";
+        vm.getCart();
+      });
+    },
+    getCart() {
+      const vm = this;
+      const url = `${process.env.VUE_APP_APIPATH}/api/${
+        process.env.VUE_APP_CUSTOMPATH
+      }/cart`;
+      vm.isLoading = true;
+      this.$http.get(url).then(response => {
+        console.log(response);
+        vm.isLoading = false;
+      });
     }
   },
   created() {
     this.getProducts();
+    this.getCart();
   }
 };
 </script>
