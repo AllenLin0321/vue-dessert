@@ -92,7 +92,7 @@
     </div>
 
     <!-- Cart List -->
-    <div class="my-5 row justify-content-center">
+    <div class="my-5 row justify-content-center" v-if="cart.carts">
       <div class="my-5 row justify-content-center" style="width: 60%">
         <table class="table">
           <thead>
@@ -102,7 +102,7 @@
             <th>單價</th>
           </thead>
           <tbody>
-            <tr v-for="item in cart.carts" :key="item.id" v-if="cart.carts">
+            <tr v-for="item in cart.carts" :key="item.id">
               <td class="align-middle">
                 <button
                   type="button"
@@ -141,11 +141,84 @@
         </div>
       </div>
     </div>
+
+    <!-- Form -->
+    <div class="my-5 row justify-content-center">
+      <form class="col-md-6" @submit.prevent="createOrder">
+        <div class="form-group">
+          <label for="useremail">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            name="email"
+            id="useremail"
+            v-model="form.user.email"
+            placeholder="請輸入 Email"
+            required
+          >
+          <span class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="username">收件人姓名</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="username"
+            v-model="form.user.name"
+            v-validate="'required'"
+            placeholder="輸入姓名"
+          >
+          <!-- <span class="text-danger">{{ error.has('name') }}</span> -->
+        </div>
+
+        <div class="form-group">
+          <label for="usertel">收件人電話</label>
+          <input
+            type="tel"
+            class="form-control"
+            id="usertel"
+            v-model="form.user.tel"
+            placeholder="請輸入電話"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="useraddress">收件人地址</label>
+          <input
+            type="text"
+            class="form-control"
+            name="address"
+            id="useraddress"
+            v-model="form.user.address"
+            placeholder="請輸入地址"
+          >
+          <span class="text-danger">地址欄位不得留空</span>
+        </div>
+
+        <div class="form-group">
+          <label for="comment">留言</label>
+          <textarea
+            name
+            id="comment"
+            class="form-control"
+            cols="30"
+            rows="10"
+            v-model="form.message"
+          ></textarea>
+        </div>
+        <div class="text-right">
+          <button class="btn btn-danger">送出訂單</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
  <script>
 import $ from "jquery";
+import "vee-validate";
 
 export default {
   data() {
@@ -156,6 +229,15 @@ export default {
         loadingItem: ""
       },
       cart: {},
+      form: {
+        user: {
+          name: "",
+          email: "",
+          tel: "",
+          address: ""
+        },
+        message: ""
+      },
       isLoading: false,
       coupon_code: ""
     };
@@ -236,6 +318,20 @@ export default {
       this.$http.post(url, { data: coupon }).then(response => {
         console.log(response);
         this.getCart();
+        vm.isLoading = false;
+      });
+    },
+    createOrder() {
+      const vm = this;
+      const url = `${process.env.VUE_APP_APIPATH}/api/${
+        process.env.VUE_APP_CUSTOMPATH
+      }/order`;
+      vm.isLoading = true;
+      this.$http.post(url, { data: vm.form }).then(response => {
+        console.log("訂單已建立", response);
+        if (response.data.success) {
+          vm.$router.push(`customer_checkout/${response.data.orderId}`);
+        }
         vm.isLoading = false;
       });
     }
